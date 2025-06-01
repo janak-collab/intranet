@@ -1,0 +1,18 @@
+# Disable rewrite engine
+RewriteEngine Off
+
+# Disable all authentication
+AuthType None
+Satisfy Any
+Allow from all
+Require all granted
+
+# Ensure PHP files are processed
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+
+# Allow POST requests
+<LimitExcept POST GET>
+    Require all denied
+</LimitExcept>

@@ -1,0 +1,65 @@
+# GMPM Production Configuration
+<IfModule LiteSpeed>
+    AddHandler application/x-httpd-php82 .php
+    
+    RewriteEngine On
+    
+    # Force HTTPS
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+    
+    # IP-based access control (skip for assets)
+    RewriteCond %{REQUEST_URI} !^/assets/ [NC]
+    RewriteCond %{REQUEST_URI} !^/api/public/ [NC]
+    RewriteCond %{REQUEST_URI} !\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ [NC]
+    
+    # Allowed IPs
+    RewriteCond %{REMOTE_ADDR} !^98\.233\.204\.84$
+    RewriteCond %{REMOTE_ADDR} !^173\.67\.39\.5$
+    RewriteCond %{REMOTE_ADDR} !^68\.134\.39\.4$
+    RewriteCond %{REMOTE_ADDR} !^71\.244\.156\.161$
+    RewriteCond %{REMOTE_ADDR} !^68\.134\.31\.125$
+    RewriteCond %{REMOTE_ADDR} !^24\.245\.103\.202$
+    RewriteCond %{REMOTE_ADDR} !^72\.81\.228\.74$
+    RewriteCond %{REMOTE_ADDR} !^73\.39\.186\.209$
+    # Server's own IP for curl tests
+    RewriteCond %{REMOTE_ADDR} !^65\.181\.111\.128$
+    RewriteRule ^(.*)$ - [F,L]
+    
+    # Route through index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ /index.php [QSA,L]
+</IfModule>
+
+Options -Indexes +FollowSymLinks
+DirectoryIndex index.php
+
+# Authentication
+AuthType Basic
+AuthName "Greater Maryland Pain Management - Authorized Access Only"
+AuthUserFile "/home/gmpmus/.htpasswds/passwd"
+
+# Allow assets without auth
+SetEnvIf Request_URI "^/assets/" noauth
+SetEnvIf Request_URI "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2)$" noauth
+
+<RequireAny>
+    Require env noauth
+    Require valid-user
+</RequireAny>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# Protect sensitive files
+<FilesMatch "\.(env|log|sql|bak|conf|json|xml|yml|yaml)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
