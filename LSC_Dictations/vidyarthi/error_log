@@ -1,0 +1,16 @@
+[18-Nov-2024 12:59:01 America/Chicago] PHP Warning:  Use of undefined constant date - assumed 'date' (this will throw an Error in a future version of PHP) in /home1/jvidyart/public_html/janakvidyarthi.com/private_area/LSC_Dictations/vidyarthi/facetsdictation.php on line 227
+[18-Nov-2024 12:59:01 America/Chicago] PHP Warning:  Use of undefined constant ref - assumed 'ref' (this will throw an Error in a future version of PHP) in /home1/jvidyart/public_html/janakvidyarthi.com/private_area/LSC_Dictations/vidyarthi/facetsdictation.php on line 239
+[18-Nov-2024 12:59:01 America/Chicago] PHP Warning:  Use of undefined constant pri - assumed 'pri' (this will throw an Error in a future version of PHP) in /home1/jvidyart/public_html/janakvidyarthi.com/private_area/LSC_Dictations/vidyarthi/facetsdictation.php on line 248
+[11-Dec-2024 10:42:33 America/Chicago] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'jvidyart_provider.list' doesn't exist in /home1/jvidyart/public_html/janakvidyarthi.com/private_area/LSC_Dictations/vidyarthi/esi.php:28
+Stack trace:
+#0 /home1/jvidyart/public_html/janakvidyarthi.com/private_area/LSC_Dictations/vidyarthi/esi.php(28): mysqli->query('SELECT who,titl...')
+#1 {main}
+  thrown in /home1/jvidyart/public_html/janakvidyarthi.com/private_area/LSC_Dictations/vidyarthi/esi.php on line 28
+[19-Dec-2024 12:29:41 America/Chicago] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'jvidyart_provider.list' doesn't exist in /home1/jvidyart/public_html/janakvidyarthi.com/private_area/LSC_Dictations/vidyarthi/snrb.php:28
+Stack trace:
+#0 /home1/jvidyart/public_html/janakvidyarthi.com/private_area/LSC_Dictations/vidyarthi/snrb.php(28): mysqli->query('SELECT who,titl...')
+#1 {main}
+  thrown in /home1/jvidyart/public_html/janakvidyarthi.com/private_area/LSC_Dictations/vidyarthi/snrb.php on line 28
+[30-Apr-2025 08:07:06 America/Chicago] PHP Warning:  Use of undefined constant date - assumed 'date' (this will throw an Error in a future version of PHP) in /home1/jvidyart/public_html/janakvidyarthi.com/private_area/LSC_Dictations/vidyarthi/sidictation.php on line 165
+[30-Apr-2025 08:07:06 America/Chicago] PHP Warning:  Use of undefined constant ref - assumed 'ref' (this will throw an Error in a future version of PHP) in /home1/jvidyart/public_html/janakvidyarthi.com/private_area/LSC_Dictations/vidyarthi/sidictation.php on line 177
+[30-Apr-2025 08:07:06 America/Chicago] PHP Warning:  Use of undefined constant pri - assumed 'pri' (this will throw an Error in a future version of PHP) in /home1/jvidyart/public_html/janakvidyarthi.com/private_area/LSC_Dictations/vidyarthi/sidictation.php on line 186
