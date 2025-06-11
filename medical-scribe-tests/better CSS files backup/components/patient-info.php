@@ -1,4 +1,6 @@
-<?php
+<?php
+
+use App\Services\Logger;
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -8,7 +10,7 @@ function getProviders($pdo) {
         $stmt = $pdo->query("SELECT id, Provider FROM Providers ORDER BY Provider");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
-        error_log("Provider Query Error: " . $e->getMessage());
+        Logger::error('Provider Query Error: ', ['error' => $e->getMessage()]);
         return [];
     }
 }

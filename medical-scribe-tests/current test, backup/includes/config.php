@@ -1,4 +1,6 @@
-<?php
+<?php
+
+use App\Services\Logger;
 /**
  * Main configuration file for Medical Scribe application
  */
@@ -218,7 +220,7 @@ function getDbConnection() {
                 DB_CONFIG['options']
             );
         } catch (PDOException $e) {
-            error_log("Database Connection Error: " . $e->getMessage());
+            Logger::error('Database Connection Error: ', ['error' => $e->getMessage()]);
             return null;
         }
     }

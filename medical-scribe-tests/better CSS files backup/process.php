@@ -1,4 +1,6 @@
-<?php
+<?php
+
+use App\Services\Logger;
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -130,7 +132,7 @@ try {
     }
 
     // Log error
-    error_log("Order Processing Error: " . $e->getMessage());
+    Logger::error('Order Processing Error: ', ['error' => $e->getMessage()]);
     
     // Store error and redirect
     $_SESSION['form_errors'] = [$e->getMessage()];

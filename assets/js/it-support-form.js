@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Character counter
     descriptionTextarea.addEventListener('input', function() {
         const count = this.value.length;
-        charCount.textContent = `${count} / 2000`;
+        charCount.textContent = count + ' / 2000';
         
         if (count > 1800) {
             charCount.style.color = 'var(--error-color)';
@@ -91,22 +91,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show alert message
     function showAlert(type, message) {
         const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type}`;
+        alertDiv.className = 'alert alert-' + type;
         
-        const iconSvg = type === 'error' 
-            ? '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>'
-            : type === 'success'
-            ? '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>'
-            : '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>';
+        // Use simple emoji icons instead of SVG for now
+        let icon = '';
+        if (type === 'error') {
+            icon = '❌ ';
+        } else if (type === 'success') {
+            icon = '✓ ';
+        } else {
+            icon = 'ℹ️ ';
+        }
         
-        alertDiv.innerHTML = `${iconSvg} ${message}`;
+        alertDiv.textContent = icon + message;
         
         alertContainer.innerHTML = '';
         alertContainer.appendChild(alertDiv);
         
         // Auto-dismiss after 5 seconds
-        setTimeout(() => {
-            alertDiv.remove();
+        setTimeout(function() {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
         }, 5000);
     }
 
@@ -141,34 +147,57 @@ document.addEventListener('DOMContentLoaded', function() {
         btnText.style.display = 'none';
         btnSpinner.style.display = 'inline-block';
 
-        // Simulate form submission (replace with actual submission)
         try {
             // Create form data
             const formData = new FormData(form);
             
-            // In a real implementation, you would submit to the server here
-            // const response = await fetch(form.action, {
-            //     method: 'POST',
-            //     body: formData
-            // });
+            // Actually submit to the server
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData
+            });
             
-            // Simulate server delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            if (!response.ok) {
+                throw new Error('HTTP error! status: ' + response.status);
+            }
             
-            // Success handling
-            showAlert('success', 'Your IT support ticket has been submitted successfully!');
+            const result = await response.json();
             
-            // Clear form
-            form.reset();
-            charCount.textContent = '0 / 2000';
-            
-            // Clear saved draft
-            localStorage.removeItem('itSupportDraft');
-            
-            // Redirect after a delay
-            setTimeout(() => {
-                window.location.href = '/admin/tickets';
-            }, 2000);
+            if (result.success) {
+                // Success handling
+                showAlert('success', result.message || 'Your IT support ticket has been submitted successfully!');
+                
+                // Update CSRF token if provided
+                if (result.new_csrf_token) {
+                    document.getElementById('csrfToken').value = result.new_csrf_token;
+                }
+                
+                // Clear form
+                form.reset();
+                charCount.textContent = '0 / 2000';
+                
+                // Clear saved draft
+                localStorage.removeItem('itSupportDraft');
+                
+                // Show ticket number if provided
+                if (result.ticket_id) {
+                    showAlert('info', 'Your ticket number is #' + result.ticket_id + '. Estimated response time: ' + (result.estimated_response || 
+'24 hours'));
+                }
+                
+                // Redirect after a delay
+                setTimeout(() => {
+                    window.location.href = '/view-tickets';
+                }, 3000);
+                
+            } else {
+                // Handle server-side errors
+                let errorMessage = result.error || 'Failed to submit ticket. Please try again.';
+                if (result.errors) {
+                    errorMessage = Object.values(result.errors).join(', ');
+                }
+                showAlert('error', errorMessage);
+            }
             
         } catch (error) {
             showAlert('error', 'An error occurred while submitting your ticket. Please try again.');
@@ -214,11 +243,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.name) nameInput.value = data.name;
                 if (data.location) locationSelect.value = data.location;
                 if (data.category) {
-                    const categoryRadio = document.querySelector(`input[name="category"][value="${data.category}"]`);
+                    const categoryRadio = document.querySelector('input[name="category"][value="' + data.category + '"]');
                     if (categoryRadio) categoryRadio.checked = true;
                 }
                 if (data.priority) {
-                    const priorityRadio = document.querySelector(`input[name="priority"][value="${data.priority}"]`);
+                    const priorityRadio = document.querySelector('input[name="priority"][value="' + data.priority + '"]');
                     if (priorityRadio) priorityRadio.checked = true;
                 }
                 if (data.description) {
@@ -293,7 +322,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const helpText = categoryHelp[this.value];
                 if (helpText) {
-                    descriptionTextarea.placeholder = `Please describe your issue in detail. ${helpText}`;
+                    descriptionTextarea.placeholder = 'Please describe your issue in detail. ' + helpText;
                 }
             }
         });

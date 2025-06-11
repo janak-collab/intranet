@@ -1,12 +1,13 @@
+@import url("header-styles.css");
 /* Form Styles - Greater Maryland Pain Management */
 :root {
-    --primary-color: #f26522;
-    --primary-hover: #d4541d;
-    --secondary-color: #2c3e50;
+    --primary-color: #f26522; /* GMPM Orange */
+    --primary-hover: #d9581f;
+    --secondary-color: #003049;
     --background-color: #f8fafc;
     --card-background: #ffffff;
-    --text-primary: #1a202c;
-    --text-secondary: #4a5568;
+    --text-primary: #58595b;
+    --text-secondary: rgba(88, 89, 91, 0.75); /* GMPM Gray 75% */
     --border-color: #e2e8f0;
     --border-light: #f0f0f0;
     --hover-light: #fafafa;
@@ -416,4 +417,13 @@ body {
         width: 100%;
         justify-content: center;
     }
+}
+
+/* Adjustment for sticky header on form pages */
+.container {
+    padding-top: 1rem;
+}
+
+.form-card:first-child {
+    margin-top: 1rem;
 }

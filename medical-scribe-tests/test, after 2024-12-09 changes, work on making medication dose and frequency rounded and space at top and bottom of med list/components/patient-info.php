@@ -90,7 +90,7 @@
                             }
                             
                         } catch (PDOException $e) {
-                            error_log("Database Error: " . $e->getMessage());
+                            Logger::error('Database Error: ', ['error' => $e->getMessage()]);
                             echo "<p class='error'>Unable to load provider list. Please try again later.</p>";
                         }
                         ?>

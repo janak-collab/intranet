@@ -1,4 +1,6 @@
 <?php
+
+use App\Services\Logger;
 ob_start();
 
 ini_set('display_errors', 1);
@@ -315,7 +317,7 @@ try {
             echo $dompdf->output();
 
         } catch (Exception $e) {
-            error_log("Error: " . $e->getMessage());
+            Logger::error('Error: ', ['error' => $e->getMessage()]);
             error_log("Stack trace: " . $e->getTraceAsString());
             
             while (ob_get_level()) {
@@ -337,7 +339,7 @@ try {
         ]);
     }
 } catch (Exception $e) {
-    error_log("Configuration error: " . $e->getMessage());
+    Logger::error('Configuration error: ', ['error' => $e->getMessage()]);
     http_response_code(500);
     echo json_encode([
         'status' => 'error',

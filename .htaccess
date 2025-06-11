@@ -26,10 +26,38 @@ DirectoryIndex index.php
 # ============================================================================
 <IfModule LiteSpeed>
     RewriteEngine On
+
+    # Remove .php extension and add trailing slash handling
+    RewriteCond %{REQUEST_FILENAME} !-d
+    # Skip API routes
+    RewriteCond %{REQUEST_URI} !^/api/ [NC]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php?route=$1 [QSA,L]
     
     # Force HTTPS
     RewriteCond %{HTTPS} off
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+    # ============================================================================
+    # ROUTING - Route all requests through index.php
+    # ============================================================================
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+    
+    # Route everything through index.php
+    # Skip API routes
+    RewriteCond %{REQUEST_URI} !^/api/ [NC]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    # Allow direct access to test files
+    RewriteCond %{REQUEST_URI} !^/test-.*\.php$ [NC]
+    RewriteRule ^(.*)$ /index.php [QSA,L]
     
     # Block access to hidden files and directories
     RewriteRule ^\.(.*)$ - [F,L]
@@ -66,20 +94,32 @@ DirectoryIndex index.php
     RewriteCond %{REQUEST_URI} !^/api/public/ [NC]
     RewriteCond %{REQUEST_URI} !\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ [NC]
     
-    # Allowed IPs
+    # IP whitelist entres (with location comments)
+    # Catonsville Office
     RewriteCond %{REMOTE_ADDR} !^98\.233\.204\.84$
+    # Edgewater Office
     RewriteCond %{REMOTE_ADDR} !^173\.67\.39\.5$
+    # Elkridge Office
     RewriteCond %{REMOTE_ADDR} !^68\.134\.39\.4$
+    # Glen Burnie Office
     RewriteCond %{REMOTE_ADDR} !^71\.244\.156\.161$
+    # Home
     RewriteCond %{REMOTE_ADDR} !^68\.134\.31\.125$
+    # Leonardtown Office
     RewriteCond %{REMOTE_ADDR} !^24\.245\.103\.202$
+    # Localhost Office
+    RewriteCond %{REMOTE_ADDR} !^127\.0\.0\.1$
+    # Odenton Office
     RewriteCond %{REMOTE_ADDR} !^72\.81\.228\.74$
+    # Prince Frederick Office
     RewriteCond %{REMOTE_ADDR} !^73\.39\.186\.209$
-    # Server's own IP for curl tests
+    # Server Office
     RewriteCond %{REMOTE_ADDR} !^65\.181\.111\.128$
     RewriteRule ^(.*)$ - [F,L]
     
     # Route through index.php
+    # Skip API routes
+    RewriteCond %{REQUEST_URI} !^/api/ [NC]
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ /index.php [QSA,L]
@@ -89,12 +129,16 @@ DirectoryIndex index.php
 # AUTHENTICATION
 # ============================================================================
 AuthType Basic
+# Allow server access without auth
+SetEnvIf Remote_Addr "^65.181.111.128$" noauth
+
 AuthName "Greater Maryland Pain Management - Authorized Access Only"
 AuthUserFile "/home/gmpmus/.htpasswds/passwd"
 
 # Allow assets without auth
 SetEnvIf Request_URI "^/assets/" noauth
 SetEnvIf Request_URI "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2)$" noauth
+SetEnvIf Request_URI "^/(favicon.*\.(ico|png|svg)|apple-touch-icon\.png|site\.webmanifest|web-app-manifest.*\.png)$" noauth
 
 <RequireAny>
     Require env noauth
